@@ -1,4 +1,5 @@
-import { techs } from "../data/dataSet.js"
+// import { techs } from "../data/dataSet.js"
+import {Tech} from "../model/model.js"
 
 const introToAPI = async (req, res) => {
     res.status(200).json({
@@ -41,74 +42,95 @@ const introToAPI = async (req, res) => {
     })
 }
 
+// 
 const getAllLanguages = (req, res) => {
-    res.status(200).json({ message: `got all ${techs.length} languages for you !`, techs })
-}
+  try {
+    res.status(200).json({
+      message: `Got all ${techs.length} languages for you!`,
+      count: techs.length,
+      techs,
+    });
+  } catch (err) {
+    console.error("Error fetching all languages:", err);
+    res.status(500).json({ message: "Internal Server Error", error: err.message });
+  }
+};
+
 
 const getRandomLanguage = (req, res) => {
+  try {
+    const randomNumber = Math.floor(Math.random() * techs.length);
+    const tech = techs[randomNumber];
 
-    let randomNuber = Math.floor((Math.random() * 98) + 1)
+    if (!tech) throw new Error("Failed to fetch random language");
 
-    let randomLanguage = techs.filter((tech, index) => {
-        return index == randomNuber
-    })
+    res.status(200).json({
+      message: "Got a random language for you!",
+      tech,
+    });
+  } catch (err) {
+    console.error("Error fetching random language:", err);
+    res.status(500).json({ message: "Internal Server Error", error: err.message });
+  }
+};
 
-    let [tech] = randomLanguage
-
-    res.status(200).json({ message: "you a random language for you !", tech })
-}
 
 const getFilteredData = (req, res) => {
-    try {
+  try {
+    let { scope, difficulty, duration } = req.query;
 
-        let { scope, difficulty, duration } = req.query
+    if (!scope && !difficulty && !duration)
+      throw new Error("Invalid filters. Please add 'scope', 'difficulty', or 'duration' as filters.");
 
-        if (!scope && !difficulty && !duration) throw ("invalid filters. please add Scope, Difficulty, Duration as filters")
+    let filteredData = [...techs];
+    let filterString = [];
 
-        let filteredData = techs
-
-        let filterString = ''
-
-        if (difficulty) {
-            filterString += "/difficulty"
-            filteredData = filteredData.filter((data) => {
-                return data.difficulty.toLowerCase() === difficulty.toLowerCase().trim()
-            })
-        }
-
-        if (duration) {
-            filterString += "/duration"
-            filteredData = filteredData.filter((data) => {
-                let durationArray = data.duration.split(" ")
-                return Number(durationArray[0]) <= Number(duration.toLowerCase().trim())
-            })
-             }
-
-           
-        // multiple scope
-       if (scope) {
-    filterString += "/scope"
-
-    // Convert comma-separated scopes to array
-    const scopeArray = scope.split(",").map(s => s.toLowerCase().trim());
-    filteredData = filteredData.filter((data) => {
-        // Convert each data.scope item to lowercase for case-insensitive match
-        const dataScopes = data.scope.map(item => item.toLowerCase().trim());
-
-        // Check if every requested scope exists in data.scope
-        return scopeArray.every(reqScope => dataScopes.includes(reqScope));
-    })
-}
-
-        if (filteredData.length == 0) throw (`unable to filter data based on ${filterString} : ${scope}/${difficulty}/${duration} months`)
-
-        res.status(200).json({ message: "we got data you asked for !", filteredBaseOn: filterString, results: filteredData.length, filteredData })
-
-    } catch (err) {
-        console.log("error while filter : ", err)
-        res.status(500).json({ message: "unable to get filter data", result: null, err })
+    // 🔹 Difficulty filter
+    if (difficulty) {
+      filterString.push("difficulty");
+      filteredData = filteredData.filter((data) =>
+        data.difficulty.toLowerCase() === difficulty.toLowerCase().trim()
+      );
     }
-}
+
+    // 🔹 Duration filter
+    if (duration) {
+      filterString.push("duration");
+      filteredData = filteredData.filter((data) => {
+        const months = Number(data.duration.split(" ")[0]);
+        return months <= Number(duration.trim());
+      });
+    }
+
+    // 🔹 Scope filter (supports multiple)
+    if (scope) {
+      filterString.push("scope");
+      const scopeArray = scope.split(",").map((s) => s.toLowerCase().trim());
+      filteredData = filteredData.filter((data) => {
+        const dataScopes = data.scope.map((item) => item.toLowerCase().trim());
+        return scopeArray.every((reqScope) => dataScopes.includes(reqScope));
+      });
+    }
+
+    if (filteredData.length === 0)
+      throw new Error(`No data found for filters: ${filterString.join(", ")}`);
+
+    res.status(200).json({
+      message: "Filtered data fetched successfully!",
+      filtersUsed: filterString,
+      results: filteredData.length,
+      filteredData,
+    });
+
+  } catch (err) {
+    console.error("Error while filtering:", err.message);
+    res.status(500).json({
+      message: "Unable to fetch filtered data",
+      error: err.message,
+    });
+  }
+};
+
 const NewLanguage = (req, res) => {
     try {
 
