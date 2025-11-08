@@ -1,0 +1,29 @@
+<%-include(./partials/header.ejs)%>
+
+<h1>This is index Page</h1>
+
+<form action="/formdata" method="post">
+    <h1>Application Form</h1><br>
+    <lable for="fname">  Name:</lable>
+    <input type="text" placeholder="Enter your Name" name="name" id="fname" required>
+    <br><br>
+    <label for="phone">Enter phone number:</label>
+    <input for="tel" name="phone" required>
+    <br><br>
+    <lable for="email">Enter email id:</lable>
+    <input for="email" placeholder="Enter your email" name="email" id="enamiid" required>
+    <br><br>
+</form>
+ <table border="1">
+
+    <% for(let i = 0 ; i < results.length; i ++){ %>
+
+        <tr>
+            <td><%= results[i].name %></td>
+            <td><%= results[i].phone %></td>
+            <td><%= results[i].email %></td>
+        </tr>
+    <% } %>
+
+    </table>
+<%-include(./partials/footer.ejs)%>
