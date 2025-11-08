@@ -1,0 +1,179 @@
+***MongoDB follows CRUD operations:**
+
+Create – Read – Update – Delete
+
+//Create Command
+
+The use command allows you to switch to an existing database or implicitly create a new one if it doesn't exist.
+
+In MongoDB, the create command is used to create a new collection explicitly in a database.
+
+Syntax
+
+ db.createCollection(<name>, <options>)
+ 
+
+1. use myDatabase
+
+2.Create a Collection 
+
+ db.createCollection("collection_name")
+
+3. Create Documents (Insert Data)
+
+Insert one document:
+db.collection.insertOne({ name: "Aditi", age: 22, city: "Pune" })
+
+Insert multiple documents:
+
+db.students.insertMany([
+
+    {
+        _id: 1,
+        name: "adii",
+        phone : 8468953713,
+        age : 20,
+        address: {
+            street: "opposite indira Hospital",
+            city: "Nagpur",
+            pincode: "440024",
+            state: "Maharashtra"
+        }
+    },
+    {
+_id: 2,
+        name: "mahii",
+        phone : 9022836184,
+        age : 20,
+        address: {
+            street: "plot 4, sharda layout",
+            city: "nagpur",
+            pincode: "440024",
+            state: "Maharashtra"
+        }
+    },
+    {
+_id: 3,
+        name: "Sumedh",
+        phone : 9131300381,
+        age : 20,
+        address: {
+            street: " NearNTT office",
+            city: "Mumbai",
+            pincode: "440025",
+            state:"Maharashtra"
+        }
+    }
+])
+
+db -> ecommerce website
+
+*customers*
+
+db.customers.insertMany([
+    {_id: 01, name:"Nikhil Sawant", phone: "8468953214", address:"Kharbi Square"},
+    {_id: 02, name:"pooja Ganer", phone: "8461243214", address:"omkar Square"},
+    {_id: 03, name:"shena awchat", phone: "8468953267", address:"trimurti Square"}
+])
+
+*Products*
+
+db.products.insertMany([
+  { 
+    name: "Wireless Mouse", 
+    category_id: ObjectId(), 
+    price: 799, 
+    stock: 50, 
+    brand: "Logitech", 
+    description: "Ergonomic wireless mouse with USB receiver"
+  },
+  { 
+    name: "Bluetooth Headphones", 
+    category_id: ObjectId(), 
+    price: 1999, 
+    stock: 30, 
+    brand: "Boat", 
+    description: "Over-ear headphones with 12-hour battery life"
+  }
+])
+
+*orders*
+
+db.orders.insertOne({
+ 
+ _id: 301,
+ boughtBy: {customerId: 14}
+ products:[
+    {productId: 20, qty: 3, subTotal: 100}
+    {productId: 02, qty: 2, subTotal: 234.34}
+ ],
+ shipingAddress:{
+    street: "plot 101, sanjay gandhi nagar",
+    city: "nagpur",
+    pincode: "440024",
+    state: "Maharashtra"
+},
+timeStamp: Date.now()
+})
+
+//read
+
+db.collection.findOne() -> null / ObjectId
+db.collection.find() -> [] / [object/s]
+
+query
+
+{} -> un conditionally -> everything
+
+{field: "match something"}
+
+1. Comparison Operators
+
+Operator	    Description	            Example
+1.$eq	              Equal to	        db.products.find({ price: { $eq: 1000 } })
+2.$ne	            Not equal to	    db.products.find({ brand: { $ne: "Boat" } })
+3.$gt	            Greater than	    db.products.find({ price: { $gt: 1000 } })
+4.$gte	   Greater than or equal	db.products.find({ price: { $gte: 1000 } })
+5.$lt	          Less than	            db.products.find({ price: { $lt: 1000 } })
+6.$lte	   Less than or equal	    db.products.find({ price: { $lte: 2000 } })
+7.$in	  Matches any value in an array	db.products.find({ category: { $in: ["Electronics", "Fashion"] } })
+8.$nin	    Not in array	        db.products.find({ brand: { $nin: ["Boat", "Sony"] } })
+
+1:- db.products.find({ price: { $eq: 500 } })
+[
+    {_id: 02, name:'Notebook', stock: 800, price: 500,discount: 10 }
+    {
+        _id: 02,
+        name: 'Notebook',
+        stock: 800,
+        price: 500,
+        discount: 10
+    }
+
+
+2:- db.products.find({ price: { $ne: 50 } })
+[
+     {_id: 14, name:'Cardboard', stock: 150, price: 50,discount: 5 },
+    {
+        _id: 14,
+        name: 'Cardboard',
+        stock: 200,
+        price: 150,
+        discount: 5
+    },
+    {_id: 05, name:'pen', stock: 100, price: 50,discount: 2 },
+    {
+        _id: 05,
+        name: 'Pen',
+        stock: 100,
+        price: 50,
+        discount: 2
+    },
+    {
+       _id: ObjectId('68efbd3745580bc6d6cebea4'),
+    name: 'marker',
+    discount: 5
+  },
+  { _id: 15, name: 'marker', discount: 5 } 
+    
+]
